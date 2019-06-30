@@ -23,10 +23,16 @@ class App extends Component {
   }
 
   addPlayer = () => {
+    // Name should count how many items in array and append 'Player '
+    const new_player_name = 'Player ' + (this.state.players.length + 1);
+    // Create new object with name & overall score
+    const new_player = {
+      name: new_player_name,
+      score: 0
+    }
     // Add Object to players array in state
     // Spread in current players array and add new player
-    // Player Obj has name & overall score
-    // Name should count how many items in array and append 'Player '
+    this.setState({ players: [...this.state.players, new_player]});
   }
 
   startGame = () => {
@@ -41,11 +47,23 @@ class App extends Component {
 
   rollDice = () => {
     // Set 2x random variable from 1-6
+    let dice_one = Math.floor(Math.random() * 6) + 1;
+    let dice_two = Math.floor(Math.random() * 6) + 1;
     // Detect whether both dice are a 1
-    // If so, set player score to 0 and endTurn()
+    if (dice_one && dice_two === 1) {
+      // If so, set player score to 0 and changeTurn()
+      this.setState({ [this.state.players[this.state.currentPlayer].score]: 0 });
+      this.changeTurn();
+    }
     // Detect whether either dice are a 1
-    // if so, endTurn()
+    else if (dice_one || dice_two) {
+      // if so, changeTurn()
+      this.changeTurn();
+    }
     // else, add dice total to turnScore
+    else {
+      this.endTurn();
+    }
   }
 
   endTurn = () => {
@@ -64,6 +82,7 @@ class App extends Component {
     return (
       <div className="App">
         <h1>Pigs!</h1>
+        <button onClick={this.addPlayer}>Add Player</button>
       </div>
     );
   }
