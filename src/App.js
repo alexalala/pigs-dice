@@ -1,6 +1,28 @@
 import React, { Component, Fragment } from 'react';
 
-import './App.css';
+import styled from 'styled-components';
+
+import Dice from './components/Dice';
+import Player from './components/Player';
+
+const CentredContainer = styled.div`
+  display: flex;
+  justify-content: center;
+`;
+
+const CentredPlayersContainer = styled(CentredContainer)`
+  display: flex;
+  justify-content: center;
+
+  > div:nth-child(${(props) => props.current + 1}) {
+    border: 3px solid #2D2D2D;
+  }
+`;
+
+const TurnCopy = styled.div`
+  margin: 1rem;
+  font-size: 1.25rem;
+`;
 
 class App extends Component {
   constructor(props) {
@@ -8,7 +30,7 @@ class App extends Component {
     this.state = {
       players: [],
       currentPlayerIndex: 0,
-      turnScore: 0,
+      turnScore: null,
       dice: [],
       gameStarted: false,
       winner: ""
@@ -60,7 +82,6 @@ class App extends Component {
 
     let dice_total = dice_one + dice_two;
     let turn_total = this.state.turnScore + dice_total;
-
     let players_copy = this.state.players;
 
     let diceRoll = async() => {
@@ -98,9 +119,9 @@ class App extends Component {
     // set turnScore back to 0
     this.setState({ turnScore: 0 });
     // isGameWon()
-    this.isGameWon()
+    this.isGameWon();
     // changeTurn()
-    this.changeTurn()
+    this.changeTurn();
   }
 
   isGameWon = () => {
@@ -108,43 +129,72 @@ class App extends Component {
     if (this.state.players[this.state.currentPlayerIndex].score >= 100) {
       // If it is, flip gameWon bool to true
       this.setState({ winner: this.state.players[this.state.currentPlayerIndex].name });
-      debugger;
     }
   }
 
   render() {
     return (
       <div className="App">
-        <h1>Pigs!</h1>
-        {/* First state - Game not started */}
-        { !this.state.gameStarted &&
-          <Fragment>
-            <button onClick={this.addPlayer}>Add Player</button>
-            <button onClick={this.startGame}>Start Game</button>
-          </Fragment>
-        }
+        <div>
+          <h1>Pig</h1>
+          {/* First state - Game not started */}
+          { (!this.state.gameStarted && !this.state.winner) &&
+            <Fragment>
+              { (this.state.players === undefined || this.state.players.length === 0)
+                ? (
+                  <Fragment>
+                    <h2>Add a player to start the game...</h2>
+                    <button onClick={this.addPlayer}>Add Player</button>
+                  </Fragment>
+                ) : (
+                  <Fragment>
+                    <CentredContainer>
+                      {this.state.players.map(player =>
+                        <Player player={player} key={player.name}/>
+                      )}
+                    </CentredContainer>
+                    <button onClick={this.addPlayer}>Add Player</button>
+                    <button onClick={this.startGame}>Start Game</button>
+                  </Fragment>
+                )
+              }
+            </Fragment>
+          }
 
-        {/* Second state - Game started */}
-        { this.state.gameStarted &&
-          <Fragment>
-            { this.state.players.map(player =>
-              <div key={player.name}>
-                <p>player: {player.name}</p>
-                <p>score: {player.score}</p>
-              </div>
-            )}
-            <p>{this.state.dice_one} & {this.state.dice_two}</p>
-            <p>Current turn score is {this.state.turnScore}.</p>
-            <button onClick={this.rollDice}>Roll Dice</button>
-            <button onClick={this.endTurn}>End Turn</button>
-          </Fragment>
-        }
-        {/* Second state - Game started */}
-        {
-          this.state.winner &&
-          <p>And we have a winner! Well done {this.state.winner}</p>
-        }
-
+          {/* Second state - Game started */}
+          { (this.state.gameStarted && !this.state.winner) &&
+            <Fragment>
+              <h2>It's {this.state.players[this.state.currentPlayerIndex].name}'s turn!</h2>
+              <CentredPlayersContainer current={this.state.currentPlayerIndex}>
+                { this.state.players.map(player =>
+                  <Player player={player} key={player.name} />
+                )}
+              </CentredPlayersContainer>
+                { this.state.turnScore !== null &&
+                  <Fragment>
+                    <CentredContainer>
+                      <Dice dice={this.state.dice} />
+                    </CentredContainer>
+                    <TurnCopy>Current turn score is {this.state.turnScore}.</TurnCopy>
+                  </Fragment>
+                }
+              <button onClick={this.rollDice}>Roll Dice</button>
+              <button onClick={this.endTurn}>End Turn</button>
+            </Fragment>
+          }
+          {/* Third state - Game won */}
+          {
+            this.state.winner &&
+            <Fragment>
+              <h2>We have a winner - congratulations {this.state.winner}!</h2>
+              <CentredContainer>
+                {this.state.players.map(player =>
+                  <Player player={player} key={player.name}/>
+                )}
+              </CentredContainer>
+            </Fragment>
+          }
+        </div>
       </div>
     );
   }
