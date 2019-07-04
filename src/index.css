@@ -34,3 +34,8 @@ button:hover {
   background: white;
   cursor: pointer;
 }
+
+a {
+  font-size: 1.25rem;
+  color: black;
+}

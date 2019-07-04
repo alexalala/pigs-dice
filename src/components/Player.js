@@ -30,15 +30,15 @@ const PlayerIcon = styled.div`
   }
 `;
 
-const Player = (props) => {
+const Player = ({ name, score }) => {
   return (
     <PlayerContainer>
       <PlayerIcon>
         <div></div>
         <div></div>
       </PlayerIcon>
-      <p>{props.player.name}</p>
-      <p>score: {props.player.score}</p>
+      <p>{name}</p>
+      <p>score: {score}</p>
     </PlayerContainer>
   )
 };
